@@ -1,7 +1,10 @@
-import { BaseEntity } from '@base/base.entity';
+import { BaseEntity } from '@base/entities/base.entity';
 import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { UseDto } from '@/decorators/use-dto.decorator';
+import { ShortUrlDto } from '../dto/short-url.dto';
 
 @Entity('shorten_url')
+@UseDto(ShortUrlDto)
 export class ShortenUrlEntity extends BaseEntity {
   @PrimaryColumn('text')
   shortUrl: string;

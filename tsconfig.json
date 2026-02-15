@@ -28,7 +28,8 @@
       "@const/*": ["src/const/*"],
       "@database/*": ["src/database/*"],
       "@errors/*": ["src/errors/*"],
-      "@app-types/*": ["src/types/*"]
+      "@app-types/*": ["src/types/*"],
+      "@app-decorators/*": ["scr/decorators/*"]
     }
   }
 }

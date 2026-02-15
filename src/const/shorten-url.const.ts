@@ -1,0 +1,1 @@
+export const MAX_CREATING_SHORTEN_URL_ATTEMPTS = 10;
