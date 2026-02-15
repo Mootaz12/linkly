@@ -5,7 +5,11 @@ import { UrlGeneratorService } from './url-generator.service';
 import { MAX_CREATING_SHORTEN_URL_ATTEMPTS } from '@const/shorten-url.const';
 import { ShortenUrlEntity } from '@modules/url-shortener/entities/shorten-url.entity';
 import { CreateShortUrlDto } from '../dto';
-import { MaxCreatingShortenUrlAttemptsExceeded } from '@errors/shorten-url.error';
+import {
+  MaxCreatingShortenUrlAttemptsExceeded,
+  ShortenUrlExpiredException,
+  ShortenUrlNotFoundException,
+} from '@errors/shorten-url.error';
 
 @Injectable()
 export class UrlShortenerService {
@@ -26,8 +30,9 @@ export class UrlShortenerService {
     let attempts = 0;
     while (!isUnique && attempts < MAX_CREATING_SHORTEN_URL_ATTEMPTS) {
       slug = this.urlGeneratorService.generateSlug();
+      const fullShortUrl = `${requestUrl}/${slug}`;
       const existing = await this.shortenUrlRepository.findOne({
-        where: { shortUrl: slug },
+        where: { shortUrl: fullShortUrl },
       });
 
       isUnique = !existing;
@@ -45,5 +50,22 @@ export class UrlShortenerService {
     const saved = await this.shortenUrlRepository.save(shortenUrl);
 
     return saved.toDto();
+  }
+
+  async getLongUrl(slug: string, requestUrl: string): Promise<string> {
+    const fullShortUrl = `${requestUrl}/${slug}`;
+    const entity = await this.shortenUrlRepository.findOne({
+      where: { shortUrl: fullShortUrl },
+    });
+
+    if (!entity) {
+      throw new ShortenUrlNotFoundException();
+    }
+
+    if (entity.expirationDate && new Date() > entity.expirationDate) {
+      throw new ShortenUrlExpiredException();
+    }
+
+    return entity.longUrl;
   }
 }

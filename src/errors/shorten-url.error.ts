@@ -11,3 +11,23 @@ export class MaxCreatingShortenUrlAttemptsExceeded extends ServerError {
     );
   }
 }
+
+export class ShortenUrlNotFoundException extends ServerError {
+  constructor() {
+    super(
+      'Shortened URL not found',
+      `${ErrorCodesPrefix.SHORTENER_ERROR}001`,
+      HttpStatus.NOT_FOUND,
+    );
+  }
+}
+
+export class ShortenUrlExpiredException extends ServerError {
+  constructor() {
+    super(
+      'Shortened URL has expired',
+      `${ErrorCodesPrefix.SHORTENER_ERROR}002`,
+      HttpStatus.GONE,
+    );
+  }
+}
