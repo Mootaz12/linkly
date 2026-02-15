@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UrlShortenerModule } from './url-shortener/url-shortener.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -21,12 +19,10 @@ import { UrlShortenerModule } from './url-shortener/url-shortener.module';
         database: configService.get('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity.ts'],
         synchronize: false,
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
     }),
-    UrlShortenerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
