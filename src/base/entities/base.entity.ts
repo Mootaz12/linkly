@@ -1,4 +1,4 @@
-import { DTO_CLASS_KEY } from '@/decorators/use-dto.decorator';
+import { DTO_CLASS_KEY } from '@app-decorators/use-dto.decorator';
 import {
   CreateDateColumn,
   UpdateDateColumn,
