@@ -9,7 +9,10 @@ import { dataSourceOptions } from './database/data-source';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(dataSourceOptions),
+    TypeOrmModule.forRoot({
+      ...dataSourceOptions,
+      autoLoadEntities: true,
+    }),
     UrlShortenerModule,
   ],
 })

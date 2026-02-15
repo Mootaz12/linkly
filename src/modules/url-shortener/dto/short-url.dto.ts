@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseDto } from '@/base/dto/base.dto';
+import { BaseDto } from '@base/dto/base.dto';
 import { ShortenUrlEntity } from '../entities/shorten-url.entity';
 
 export class ShortUrlDto extends BaseDto {
   @ApiProperty({
     description: 'The generated short URL',
-    example: 'http://localhost:3000/aB3xY9',
+    example: 'http://localhost/aB3xY9',
   })
   shortUrl: string;
 

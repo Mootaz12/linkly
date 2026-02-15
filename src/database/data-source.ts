@@ -12,7 +12,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE || 'postgres',
   entities: [__dirname + '/../**/*.entity.ts'],
-  migrations: [__dirname + '/../../database/migrations/*.ts'],
+  migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };

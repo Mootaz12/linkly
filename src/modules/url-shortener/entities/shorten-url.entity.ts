@@ -12,6 +12,6 @@ export class ShortenUrlEntity extends BaseEntity {
   @Column({ type: 'text' })
   longUrl: string;
 
-  @Column({ type: 'time with time zone', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   expirationDate: Date | null;
 }
