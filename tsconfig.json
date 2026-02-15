@@ -24,7 +24,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@base/*": ["src/base/*"],
-      "@modules/*": ["src/modules/*"]
+      "@modules/*": ["src/modules/*"],
+      "@const/*": ["src/const/*"],
+      "@database/*": ["src/database/*"]
     }
   }
 }

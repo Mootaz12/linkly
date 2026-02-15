@@ -2,7 +2,7 @@ import { BaseEntity } from '@base/base.entity';
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('shorten_url')
-export class ShortenUrl extends BaseEntity {
+export class ShortenUrlEntity extends BaseEntity {
   @PrimaryColumn('text')
   shortUrl: string;
 
