@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Register global exception filter
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Enable global validation with 422 status code for validation errors
   app.useGlobalPipes(
