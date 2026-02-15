@@ -1,8 +1,8 @@
 import {
   Entity,
-  PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
@@ -15,6 +15,6 @@ export class BaseEntity {
 }
 @Entity()
 export class BaseEntityWithID extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 }

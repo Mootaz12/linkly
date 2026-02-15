@@ -22,9 +22,9 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["./src/*"],
-      "@base": ["./src/base"],
-      "@modules": ["./src/modules"]
+      "@/*": ["src/*"],
+      "@base/*": ["src/base/*"],
+      "@modules/*": ["src/modules/*"]
     }
   }
 }
