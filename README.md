@@ -1,50 +1,75 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Linkly - URL Shortener
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Linkly is a URL shortener that converts long, cumbersome links into unique, 6-character slugs for easy sharing. It exists to provide a reliable, scalable, and developer-friendly way to manage link redirection with built-in expiration.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### System Architecture
 
-## Description
+```mermaid
+graph LR
+    Client["User / Client"] -- "POST /api/shorten-url" --> API["Linkly API (NestJS)"]
+    Client -- "GET /:slug" --> API
+    API -- "TypeORM" --> DB[("PostgreSQL")]
+```
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Action Flow
 
-## Project setup
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as Linkly API
+    participant DB as PostgreSQL
+
+    Note over User, DB: URL Creation
+    User->>API: POST /api/shorten-url {longUrl, expiration?}
+    API->>API: Generate 6 random bytes
+    API->>API: Encode to Base62
+    API->>API: Slice first 6 chars (Slug)
+    API->>DB: Save {slug, longUrl, expiration}
+    DB-->>API: Success
+    API-->>User: returns {shortUrl: "http://link.ly/abcd12"}
+
+    Note over User, DB: Redirection
+    User->>API: GET /abcd12
+    API->>DB: Find by Slug
+    DB-->>API: Entity Found
+    API->>API: Check Expiration
+    API-->>User: 302 Redirect to Long URL
+```
+
+## 🛠 Tech Stack Decisions
+
+### NestJS & PostgreSQL
+
+- **NestJS**: Chosen for its "batteries-included" approach, providing a robust modular architecture that scales with complexity. Its built-in support for TypeScript, dependency injection, and standardized exception handling ensures a high-quality, maintainable codebase.
+- **PostgreSQL**: Selected for its reliability, mature ecosystem, and strong indexing support. A relational model fits URL mapping well (short URL → long URL), enforces constraints like uniqueness, and keeps queries predictable as data grows. Compared to document databases, it simplifies lookups, guarantees consistency during writes, and supports efficient indexing for high-traffic redirects
+
+### Slug Generation Strategy
+
+We use `crypto.randomBytes(6)` → `Base62 Encoding` → `Take first 6 characters`.
+
+- **Entropy**: Generating 6 random bytes provides over **281 trillion** possible permutations ($256^6$), significantly reducing the risk of collisions compared to sequential counters.
+- **Base62**: Uses `0-9`, `a-z`, and `A-Z`, offering a human-friendly character set that is URL-safe and compact.
+- **Collision Resistance**: Unlike sequential IDs, this random approach prevents "ID crawling" and ensures the short URL remains opaque and secure.
+
+## 📡 Endpoint Structure
+
+- **`POST /api/shorten-url`**: The creation endpoint is prefixed with `/api` to clearly separate management actions from the redirection service. This follows REST best practices for administrative/functional APIs.
+- **`GET /:slug`**: Redirection happens at the **root level** to keep the shortened URLs as short as possible (e.g., `link.ly/xY3z8A` instead of `link.ly/api/shorten-url/xY3z8A`).
+
+## 🚀 Getting Started
 
 ```bash
+# install dependencies
 $ pnpm install
+
+# run migrations
+$ pnpm migration:run
+
+# start in development
+$ pnpm run dev
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
+## 🧪 Testing
 
 ```bash
 # unit tests
@@ -52,47 +77,4 @@ $ pnpm run test
 
 # e2e tests
 $ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
