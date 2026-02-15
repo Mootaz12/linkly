@@ -1,10 +1,15 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Register global exception filter
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Enable global validation with 422 status code for validation errors
   app.useGlobalPipes(
@@ -32,10 +37,10 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(
-    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    `[START UP] Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
   );
   console.log(
-    `Swagger documentation: http://localhost:${process.env.PORT ?? 3000}/api/docs`,
+    `[START UP] Swagger documentation: http://localhost:${process.env.PORT ?? 3000}/api/docs`,
   );
 }
 void bootstrap();

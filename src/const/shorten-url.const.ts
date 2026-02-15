@@ -1,0 +1,3 @@
+export const MAX_CREATING_SHORTEN_URL_ATTEMPTS = 10;
+export const BASE62_CHARS =
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
