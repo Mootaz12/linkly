@@ -1,12 +1,15 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, ValidationPipe, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api', {
+    exclude: [{ path: ':slug', method: RequestMethod.GET }],
+  });
 
   // Register global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());

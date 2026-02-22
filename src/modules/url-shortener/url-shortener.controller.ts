@@ -19,7 +19,7 @@ import { CreateShortUrlDto, ShortUrlDto } from './dto';
 export class UrlShortenerController {
   constructor(private readonly urlShortenerService: UrlShortenerService) {}
 
-  @Post('api/shorten-url')
+  @Post('shorten-url')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create a shortened URL' })
   @ApiBody({ type: CreateShortUrlDto })
@@ -44,6 +44,7 @@ export class UrlShortenerController {
   }
 
   @Get(':slug')
+  @HttpCode(HttpStatus.FOUND)
   @ApiOperation({ summary: 'Redirect to long URL' })
   @ApiResponse({
     status: HttpStatus.FOUND,
