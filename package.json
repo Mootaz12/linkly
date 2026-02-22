@@ -80,6 +80,15 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@modules/(.*)$": "<rootDir>/modules/$1",
+      "^@const/(.*)$": "<rootDir>/const/$1",
+      "^@utils/(.*)$": "<rootDir>/utils/$1",
+      "^@errors/(.*)$": "<rootDir>/errors/$1",
+      "^@base/(.*)$": "<rootDir>/base/$1",
+      "^@app-decorators/(.*)$": "<rootDir>/decorators/$1",
+      "^@/(.*)$": "<rootDir>/$1"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
