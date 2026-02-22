@@ -13,7 +13,7 @@ import {
   ShortenUrlNotFoundException,
 } from '@errors/shorten-url.error';
 import { UserEntity } from '@modules/users/entities/user.entity';
-import { SHORTEN_URL_QUEUE } from '@const/queues';
+import { SHORTEN_URL_QUEUE, SHORTEN_URL_JOB } from '@const/queues';
 import { UsersService } from '@modules/users/services/users.service';
 
 @Injectable()
@@ -65,18 +65,26 @@ export class UrlShortenerService {
 
   async getLongUrl(slug: string, requestUrl: string): Promise<string> {
     const fullShortUrl = `${requestUrl}/${slug}`;
-    const entity = await this.shortenUrlRepository.findOne({
+    const shortenUrl = await this.shortenUrlRepository.findOne({
       where: { shortUrl: fullShortUrl },
     });
 
-    if (!entity) {
+    if (!shortenUrl) {
       throw new ShortenUrlNotFoundException();
     }
-
-    if (entity.expirationDate && new Date() > entity.expirationDate) {
+    const { expirationDate, longUrl, shortUrl } = shortenUrl;
+    if (expirationDate && new Date() > expirationDate) {
       throw new ShortenUrlExpiredException();
     }
 
-    return entity.longUrl;
+    await this.urlVisitsQueue.add(SHORTEN_URL_JOB, {
+      shortUrl,
+    });
+
+    return longUrl;
+  }
+
+  async incrementVisits(shortUrl: string): Promise<void> {
+    await this.shortenUrlRepository.increment({ shortUrl }, 'visits', 1);
   }
 }

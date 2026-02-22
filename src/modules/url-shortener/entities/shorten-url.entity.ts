@@ -19,4 +19,6 @@ export class ShortenUrlEntity extends BaseEntity {
   @ManyToOne(() => UserEntity, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
+  @Column({ type: 'int', default: 0 })
+  visits: number;
 }

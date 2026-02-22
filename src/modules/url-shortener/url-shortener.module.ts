@@ -7,6 +7,7 @@ import { ShortenUrlEntity } from './entities/shorten-url.entity';
 import { UrlShortenerService } from './services/url-shortener.service';
 import { SHORTEN_URL_QUEUE } from '@const/queues';
 import { UsersModule } from '@modules/users/users.module';
+import { ShortenUrlProcessor } from './processors/shorten-url.processor';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { UsersModule } from '@modules/users/users.module';
     UsersModule,
   ],
   controllers: [UrlShortenerController],
-  providers: [UrlShortenerService, UrlGeneratorService],
+  providers: [UrlShortenerService, UrlGeneratorService, ShortenUrlProcessor],
 })
 export class UrlShortenerModule {}
