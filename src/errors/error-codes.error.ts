@@ -5,4 +5,6 @@
  */
 export enum ErrorCodesPrefix {
   SHORTENER_ERROR = 'E00',
+  USER_ERROR = 'E01',
+  GENERAL_ERROR = 'E02',
 }

@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { ServerError } from '@errors/server-error.error';
+import { ServicerError } from '@errors/service-error.error';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -19,7 +19,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message: string | string[] = 'Internal server error';
     let code = 'EFF999'; // Default error code for unhandled exceptions
 
-    if (exception instanceof ServerError) {
+    if (exception instanceof ServicerError) {
       status = exception.status;
       message = exception.message;
       code = exception.code;

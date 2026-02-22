@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { ErrorCodesPrefix } from './error-codes.error';
-import { ServerError } from './server-error.error';
+import { ServicerError } from './service-error.error';
 
-export class MaxCreatingShortenUrlAttemptsExceeded extends ServerError {
+export class MaxCreatingShortenUrlAttemptsExceeded extends ServicerError {
   constructor() {
     super(
       'Max attempts exceeded while trying to generate shorten-url',
@@ -12,7 +12,7 @@ export class MaxCreatingShortenUrlAttemptsExceeded extends ServerError {
   }
 }
 
-export class ShortenUrlNotFoundException extends ServerError {
+export class ShortenUrlNotFoundException extends ServicerError {
   constructor() {
     super(
       'Shortened URL not found',
@@ -22,7 +22,7 @@ export class ShortenUrlNotFoundException extends ServerError {
   }
 }
 
-export class ShortenUrlExpiredException extends ServerError {
+export class ShortenUrlExpiredException extends ServicerError {
   constructor() {
     super(
       'Shortened URL has expired',

@@ -1,6 +1,6 @@
-import { IServerError } from '@app-types/error.types';
+import { IServicerError } from '@app-types/error.types';
 
-export class ServerError extends Error implements IServerError {
+export class ServicerError extends Error implements IServicerError {
   constructor(
     public override message: string,
     public code: string,
@@ -10,6 +10,6 @@ export class ServerError extends Error implements IServerError {
     this.message = message;
     this.code = code;
     this.status = status;
-    Object.setPrototypeOf(this, ServerError.prototype);
+    Object.setPrototypeOf(this, ServicerError.prototype);
   }
 }

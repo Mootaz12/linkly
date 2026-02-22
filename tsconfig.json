@@ -29,7 +29,8 @@
       "@database/*": ["src/database/*"],
       "@errors/*": ["src/errors/*"],
       "@app-types/*": ["src/types/*"],
-      "@app-decorators/*": ["src/decorators/*"]
+      "@app-decorators/*": ["src/decorators/*"],
+      "@utils/*": ["src/utils/*"]
     }
   }
 }
