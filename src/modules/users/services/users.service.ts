@@ -11,6 +11,7 @@ import {
   UserNotFoundException,
 } from '@errors/user.error';
 import { validateField } from '@utils/fields-validations';
+import { PASSWORD_HASH_SALT } from '@const/users';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +30,7 @@ export class UsersService {
       throw new UserEmailAlreadyExistsException();
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, PASSWORD_HASH_SALT);
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,

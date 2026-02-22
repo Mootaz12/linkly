@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { UrlGeneratorService } from './url-generator.service';
 import { MAX_CREATING_SHORTEN_URL_ATTEMPTS } from '@const/shorten-url.const';
 import { ShortenUrlEntity } from '@modules/url-shortener/entities/shorten-url.entity';
@@ -10,6 +12,9 @@ import {
   ShortenUrlExpiredException,
   ShortenUrlNotFoundException,
 } from '@errors/shorten-url.error';
+import { UserEntity } from '@modules/users/entities/user.entity';
+import { SHORTEN_URL_QUEUE, SHORTEN_URL_JOB } from '@const/queues';
+import { UsersService } from '@modules/users/services/users.service';
 
 @Injectable()
 export class UrlShortenerService {
@@ -17,14 +22,19 @@ export class UrlShortenerService {
     @InjectRepository(ShortenUrlEntity)
     private readonly shortenUrlRepository: Repository<ShortenUrlEntity>,
     private readonly urlGeneratorService: UrlGeneratorService,
+    private readonly usersService: UsersService,
+    @InjectQueue(SHORTEN_URL_QUEUE) private readonly urlVisitsQueue: Queue,
   ) {}
 
   async createShortUrl(
     createShortUrlDto: CreateShortUrlDto,
     requestUrl: string,
   ) {
-    const { longUrl, expirationDate } = createShortUrlDto;
-
+    const { longUrl, expirationDate, userId } = createShortUrlDto;
+    const user = (await this.usersService.findOneOrFail(
+      userId,
+      true,
+    )) as UserEntity;
     let slug!: string;
     let isUnique = false;
     let attempts = 0;
@@ -46,6 +56,7 @@ export class UrlShortenerService {
       shortUrl: requestUrl + '/' + slug,
       longUrl,
       expirationDate: expirationDate ? new Date(expirationDate) : null,
+      user,
     });
     const saved = await this.shortenUrlRepository.save(shortenUrl);
 
@@ -54,18 +65,26 @@ export class UrlShortenerService {
 
   async getLongUrl(slug: string, requestUrl: string): Promise<string> {
     const fullShortUrl = `${requestUrl}/${slug}`;
-    const entity = await this.shortenUrlRepository.findOne({
+    const shortenUrl = await this.shortenUrlRepository.findOne({
       where: { shortUrl: fullShortUrl },
     });
 
-    if (!entity) {
+    if (!shortenUrl) {
       throw new ShortenUrlNotFoundException();
     }
-
-    if (entity.expirationDate && new Date() > entity.expirationDate) {
+    const { expirationDate, longUrl, shortUrl } = shortenUrl;
+    if (expirationDate && new Date() > expirationDate) {
       throw new ShortenUrlExpiredException();
     }
 
-    return entity.longUrl;
+    await this.urlVisitsQueue.add(SHORTEN_URL_JOB, {
+      shortUrl,
+    });
+
+    return longUrl;
+  }
+
+  async incrementVisits(shortUrl: string): Promise<void> {
+    await this.shortenUrlRepository.increment({ shortUrl }, 'visits', 1);
   }
 }
